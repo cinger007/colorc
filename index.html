@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>D3 Test</title>
+  <script type="text/javascript" src="http://d3js.org/d3.v3.min.js"></script>
+  <link rel="stylesheet" type="text/css" href="colorcstyle.css" />
+</head>
+<body>
+<!-- 
+  ********************************************************************************************************
+  Switcher 
+  ********************************************************************************************************
+-->
+<p><h2>1. Turn on the lamp</h2></p>
+<p>Click on the switcher to see the changes. When you click on it, don't release mouse right now.</p>
+<p> <i>lighted</i> : <br>0 means lamp is turned off<br>1 means lamp is turned on  </p>
+<div class='chart' id='chart-1'>
+  <img src="pics/light0.png" height=180 id="light">
+  <img src="pics/turnoff.png" height=60 id="switcher">
+</div>
+
+
+<script type='text/javascript'>
+var w = 360,
+h = 180;
+
+var lightsrc=["pics/light0.png","pics/light1.png"];
+var switchersrc=["pics/turnoff.png","pics/turnon.png"];
+var lightIndex=0;
+var textData=[
+{"cx": 20, "cy": 20, "text":"if(lighted)"},
+{"cx": 60, "cy": 50, "text":"turnoff();"},
+{"cx": 20, "cy": 80, "text":"else"},
+{"cx": 60, "cy": 110, "text":"turnon();"},
+];
+
+(function() {
+
+  var svg = d3.select("#chart-1")
+  .selectAll("svg")
+  .data([0])
+  .enter()
+  .append("svg")
+  .attr("class","secondsection")
+  .attr("left",360)
+  .attr("width", w-8)
+  .attr("height", h);
+
+  svg.selectAll("text")
+  .data(textData)
+  .enter()
+  .append("text")
+  .text(function (d) { return d.text; })
+  .attr("x", function(d) { return d.cx; })
+  .attr("y", function(d) { return d.cy; })
+  .attr("font-family", "sans-serif")
+  .attr("font-size", "20px")
+  .attr("fill", "black");
+
+  d3.select("#switcher").on("mousedown", function() {
+    if (lightIndex==0) {lightIndex=1;}
+    else lightIndex=0;
+    d3.select("#light").attr("src", lightsrc[lightIndex]);
+    d3.select("#switcher").attr("src", switchersrc[lightIndex]);
+    svg.selectAll("text").attr("fill", function (d,i) { 
+
+      if(lightIndex==1)
+      {
+        if(i<2)
+          return "black";
+        else
+          return "red";
+      }else{
+       if(i<2)
+        return "red";
+      else
+        return "black";
+    }
+  })
+    svg.selectAll("text").style("font-weight", function (d,i) { 
+      if(lightIndex==1)
+      {
+        if(i<2)
+          return "normal";
+        else
+          return "bold";
+      }else{
+       if(i<2)
+        return "bold";
+      else
+        return "normal";
+    }
+  })
+  });
+
+  d3.select("#switcher").on("mouseup", function() {
+    svg.selectAll("text").attr("fill", "black").style("font-weight","normal");
+  });
+    // var imgs1 = svg.selectAll("image").data([1]);
+    //     imgs1.enter()
+    //     .append("svg:image")
+    //     .attr("xlink:href", "pics/turnon.png")
+    //     .attr("x", "90")
+    //     .attr("y", "0")
+    //     .attr("width", "90")
+    //     .attr("height", "90");
+  })();
+  </script>
+
+<!-- 
+  ********************************************************************************************************
+  SANGUOSHA 
+  ********************************************************************************************************
+-->
+<p><h2>2. SANGUOSHA</h2></p>
+<p>Click on the different buttons to see the changes of cards and code.</p>
+<p> <b>Attention:</b> We turnover odd cards and even cards with diffrent methods.  </p>
+<div class='longchart' id='chart-2'>
+  <img src="pics/back.png" height=150 id="card0">
+  <img src="pics/back.png" height=150 id="card1">
+  <img src="pics/back.png" height=150 id="card2">
+  <img src="pics/back.png" height=150 id="card3">
+  <img src="pics/back.png" height=150 id="card4">
+  <img src="pics/back.png" height=150 id="card5">
+  <br>
+  <button onclick="reset()">Reset</button>
+  <button onclick="turnover()">Turnover all cards</button>
+  <button onclick="oddturnover()">Turnover odd cards</button>
+  <button onclick="eventurnover()">Turnover even cards</button>
+</div>
+<script type='text/javascript'>
+var cardStatus = [0,0,0,0,0,0];
+var cardText0 = [
+{ "cx": 10, "cy": 20, "text":"Test different loops."},
+{"cx": 10, "cy": 55, "text":"Show all the cards with back face."},
+{"cx": 10, "cy": 80,"text":""}];
+var cardText1 = [
+{ "cx": 10, "cy": 20, "text": "for (var i = 0; i < 6; i++) {" }, 
+{ "cx": 40, "cy": 55, "text": "turnover(i);"},
+{ "cx": 10, "cy": 80, "text": "}" } ];
+var cardText2 = [
+{ "cx": 10, "cy": 20, "text": "for (var i = 1; i < 6; i+=2) {" }, 
+{ "cx": 40, "cy": 55, "text": "turnover(i);"},
+{ "cx": 10, "cy": 80, "text": "}" } ];
+var cardText3 = [
+{ "cx": 10, "cy": 20, "text": "for (var i = 0; i < 6; i++) " }, 
+{ "cx": 40, "cy": 55, "text": "if(i%2==0)"},
+{ "cx": 70, "cy": 80, "text": "turnover(i);" } ];
+(function() {
+ var svg = d3.select("#chart-2").append("svg")
+ .attr("class","thirdsection")
+ .attr("width", w)
+ .attr("height", h);
+
+ svg.selectAll("text")
+ .data(cardText0)
+ .enter()
+ .append("text")
+ .text(function (d) { return d.text; })
+ .attr("x", function(d) { return d.cx; })
+ .attr("y", function(d) { return d.cy; })
+ .attr("font-family", "sans-serif")
+ .attr("font-size", "20px")
+ .attr("fill", "black");
+})();
+function reset(){
+  for (var i = 0;i<6;i++) {
+    d3.select("#card"+i).attr("src", "pics/back.png");
+    cardStatus[i]=0;
+  };
+  d3.selectAll("#chart-2 svg text")
+  .data(cardText0)
+  .attr("x", function(d) { return d.cx; })
+  .attr("y", function(d) { return d.cy; })
+  .text( function (d) { return d.text; });
+}
+function turnover(){
+  for (var i = 0;i<6;i++) {
+    d3.select("#card"+i).transition().duration(500).delay(i*500).attr("src", function(){return cardStatus[i]==0?"pics/hero"+i+".png":"pics/back.png"});
+    cardStatus[i]=!cardStatus[i];
+  };
+  d3.selectAll("#chart-2 svg text")
+  .data(cardText1)
+  .attr("x", function(d) { return d.cx; })
+  .attr("y", function(d) { return d.cy; })
+  .text( function (d) { return d.text; });
+}
+function oddturnover(){
+  for (var i = 1;i<6;i+=2) {
+    d3.select("#card"+i).transition().duration(500).delay(i*500/2).attr("src", function(){return cardStatus[i]==0?"pics/hero"+i+".png":"pics/back.png"});
+    cardStatus[i]=!cardStatus[i];
+  };
+  d3.selectAll("#chart-2 svg text")
+  .data(cardText2)
+  .attr("x", function(d) { return d.cx; })
+  .attr("y", function(d) { return d.cy; })
+  .text( function (d) { return d.text; });
+}
+function eventurnover(){
+  for (var i = 0;i<6;i++) {
+    if(i%2==0){
+      d3.select("#card"+i).transition().duration(500).delay(i*500/2).attr("src", function(){return cardStatus[i]==0?"pics/hero"+i+".png":"pics/back.png"});
+      cardStatus[i]=!cardStatus[i];
+    }
+  };
+  d3.selectAll("#chart-2 svg text")
+  .data(cardText3)
+  .attr("x", function(d) { return d.cx; })
+  .attr("y", function(d) { return d.cy; })
+  .text( function (d) { return d.text; });
+}
+</script>
+    <!-- 
+  ********************************************************************************************************
+  Sort 
+  ********************************************************************************************************
+-->
+<p><h2>3. Sort</h2></p>
+<p>Click on the different buttons to see the changes of bars.</p>
+<p>Both methods move the highest bar to the last, then move the second highest to the second last, and so on.</p>
+<p> <b>Attention:</b> Select sort has the less swaps than bubble sort.  </p>
+<div class='chart' id='chart-sort'>
+  <button onclick="randomcreate()">random</button>
+  <button onclick="bubblesort()">bubble</button>
+  <button onclick="selectsort()">select</button><BR>
+</div>
+
+<script type='text/javascript'>
+var bardata = [40,40,40,40,40,40,40];
+
+barrandom();
+hh=h-30;
+      // (function() {
+
+        var sortsvg1 = d3.select("#chart-sort").append("svg")
+        .attr("width", w)
+        .attr("height", hh);
+
+        var sortsvg2 = d3.select("#chart-sort").append("div")
+        .attr("class","secondsection")
+        .html("Initializing bars with random data.<br><br><br><br><br><br><br><br><br><br><br><br><br>")
+        .attr("width", w)
+        .attr("height", h);
+
+        sortsvg1.selectAll("rect")
+  .data(bardata)
+  .enter()
+  .append("rect")
+  .attr("x", function(d, i) {  return 50+i * 35; }) //Bar width plus padding
+  .attr("y", function(d){return hh-d;})
+  .attr("fill", "teal")
+  .attr("width", 20)
+  .attr("height", function(d){return d;});
+
+  sortsvg1.selectAll("text")
+  .data(bardata)
+  .enter()
+  .append("text")
+  .text(function(d) { return d;   })
+  .attr("x", function(d, i) {   return 51+i * 35;  })
+  .attr("y", function(d) {   return hh-d+11;   })
+  .attr("fill", "white")
+  .attr("font-family", "sans-serif")
+  .attr("font-size", "11px")   ;
+       // })();
+
+function createbar()
+{
+  sortsvg1.selectAll("rect")
+  .data(bardata)
+  .attr("x", function(d, i) {  return 50+i * 35; }) //Bar width plus padding
+  .attr("y", function(d){return 150-d;})
+  .attr("fill", "teal")
+  .attr("width", 20)
+  .attr("height", function(d){return d;});
+
+  sortsvg1.selectAll("text")
+  .data(bardata)
+  .text(function(d) { return d;   })
+  .attr("x", function(d, i) {   return 51+i * 35;  })
+  .attr("y", function(d) {   return 150-d+11;   })
+}
+
+function barrandom(){
+  for (var i = bardata.length - 1; i >= 0; i--)
+  {
+    bardata[i] = Math.round(40+Math.random()*110);
+  }
+
+}
+var barsmap=[0,1,2,3,4,5,6];
+function randomcreate(){
+  for (var i = barsmap.length - 1; i >= 0; i--) {
+    barsmap[i]=i;
+  };
+  sortsvg2.html("Initializing bars with random data.<br><br><br><br><br><br><br><br><br><br><br><br><br>");
+  barrandom();
+  createbar();
+}
+var delaytime = 0;
+
+function swapbar(p0,p1)
+{
+  
+  var bars=sortsvg1.selectAll("rect").filter(function(d, i) { return i==barsmap[p0]||i==barsmap[p1]; });
+
+  bars.transition().duration(500).delay(delaytime)
+  .attr("fill","red");
+
+  var pos = [50+p1 * 35,50+p0 * 35];
+  if(barsmap[p0]>barsmap[p1])
+  {
+    pos[1]=50+p1 * 35;
+    pos[0]=50+p0 * 35;
+  }
+  delaytime+=500;
+  bars.data(pos)
+  .transition().duration(500).delay(delaytime)
+  .attr("x",function(d){return d;});
+
+  sortsvg1.selectAll("text").filter(function(d, i) {
+   return i==barsmap[p0]||i==barsmap[p1]; 
+ }).data(pos)
+  .transition().duration(500).delay(delaytime)
+  .attr("x",function(d){return d+1;});
+
+  delaytime+=500;
+  bars.transition().duration(30).delay(delaytime)
+  .call(function(){
+    var temp=barsmap[p0];
+    barsmap[p0]=barsmap[p1];
+    barsmap[p1]=temp;
+  });
+
+
+  bars.transition().duration(300).delay(delaytime)
+  .attr("fill","teal");
+
+
+}
+
+function bubblesort(){
+  delaytime = 0;
+
+  for(var i=0;i<bardata.length-1;i++)
+  // var i=0;
+    {
+        for(var j=0;j<bardata.length-i-1;j++)
+        {
+          // javascript:alert(bardata[j+1]+" : "+bardata[j]);
+            if(bardata[j+1]<bardata[j])
+            {
+              // javascript:alert(bardata[j+1]+" : "+bardata[j]);
+              swapbar(j,j+1);
+              var temp = bardata[j+1];
+              bardata[j+1] = bardata[j];
+              bardata[j] = temp;
+             }
+        }
+    }
+   sortsvg2
+    .html("for(var i=0;i&lt;length-1;i++)<br> {<br> &emsp; for(var j=0;j&lt;length-i-1;j++)<br>&emsp; {<br>&emsp;&emsp; if(a[j+1]&lt;a[j])<br>&emsp;&emsp; {<br>&emsp;&emsp;&emsp; int t = a[j+1];<br>&emsp;&emsp;&emsp; a[j+1] = a[j];<br>&emsp;&emsp;&emsp; a[j] = t;<br>&emsp;&emsp; }<br>&emsp; }<br> }<br> ");
+}
+
+function selectsort(){
+  delaytime = 0;
+
+  for(var i=bardata.length-1;i>0;i--)
+    {
+// javascript:alert("aaa");
+        var max = i;
+        //查找最小值
+        for(var j = i - 1; j >=0; j --)
+            if(bardata[max] < bardata[j])
+                max = j;
+        //交换
+        // javascript:alert(i+":"+max+"  % "+bardata[max]+" : "+bardata[i]);
+        if(max != i)
+        {
+            if(max<i)
+              swapbar(max,i);
+            else
+              swapbar(i,max);
+            t = bardata[max];
+            bardata[max] = bardata[i];
+            bardata[i] = t;
+        }
+    }
+        sortsvg2.html("for(int i=length-1;i>0;i--)    {<br> &emsp;     int max = i;<br> &emsp;      //find max value<br> &emsp;      for(var j = i - 1; j >=0; j --)<br> &emsp;&emsp;          if(a[max] < a[j])<br> &emsp;&emsp;&emsp;              max = j;<br> &emsp;     if(max != i){<br> &emsp;&emsp;         t = a[max];<br> &emsp;&emsp;         a[max] = a[i];<br> &emsp;&emsp;         a[i] = t;<br> &emsp;     }<br> } ");
+}
+</script>
+<!-- 
+  ********************************************************************************************************
+  Circles 
+  ********************************************************************************************************
+-->
+ <script type='text/javascript'>
+// var data = [32, 57, 112],
+// dataEnter = data.concat(293),
+// dataExit = data.slice(0, 2),    
+// x = d3.scale.ordinal().domain([57, 32, 112]).rangePoints([0, w], 1),
+// y = d3.scale.ordinal().domain(data).rangePoints([0, h], 2);
+ </script>
+<!--  <div class='chart' id='chart-13'>
+   <pre class='code'>
+     circle.style("fill", "steelblue");
+     circle.attr("cy", 90);
+     circle.attr("r", 30);
+   </pre>
+   <button  type="button" onclick="moveLeft()">Run</button>
+   <button onclick="JavaScript:alert('Well done!')">Click Me!</button> 
+ </div> -->
+
+ <script type='text/javascript'>
+//   // (function() {
+//     var svg = d3.select("#chart-13").append("svg")
+//     .attr("class","secondsection")
+//     .attr("width", w)
+//     .attr("height", h);
+
+//     var circle = svg.selectAll(".little")
+//     .data(data)
+//     .enter().append("circle")
+//     .attr("class", "little")
+//     .attr("cx", x)
+//     .attr("cy", y)
+//     .attr("r", 12);
+
+//     // d3.select("#chart-3 button").on("click", function() {
+//     //   circle.style("fill", "#aaa").attr("r", 12).attr("cy", y);
+//     //   circle.transition().duration(500).delay(0).style("fill", "steelblue");
+//     //   circle.transition().duration(500).delay(500).attr("cy", 90);
+//     //   circle.transition().duration(500).delay(1000).attr("r", 30);
+//     // });
+// function moveLeft(){ 
+//   // JavaScript:alert('Well done!');
+//   circle.style("fill", "#aaa").attr("r", 12).attr("cy", y);
+//   circle.transition().duration(500).delay(0).style("fill", "steelblue");
+//   circle.transition().duration(500).delay(500).attr("cy", 90);
+//   circle.transition().duration(500).delay(1000).attr("r", 30); 
+// }
+//   // })();
+ </script>
+<script type="text/javascript">
+// var dataset = [ 3, 7, 15, 20, 21 ];
+// d3.select("body").selectAll("p")
+// .data(dataset)
+// .enter()
+// .append("p")
+// .text(function(d) {
+//   return "I can count up to " + d;
+// })
+// .style("color", function(d) {
+//                     if (d >= 15) {   //Threshold of 15
+//                       return "red";
+//                     } else {
+//                       return "black";
+//                     }
+//                   });
+ </script>
+</body>
+</html>     
